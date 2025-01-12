@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using PromoCodeService.Data;
 using PromoCodeService.Data.Repositories;
 using PromoCodeService.Hubs;
+using PromoCodeService.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,7 +11,10 @@ var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__De
 
 builder.Services.AddDbContext<PromoCodeDbContext>(options =>
     options.UseNpgsql(connectionString));
+
 builder.Services.AddScoped<IPromoCodeRepository, PromoCodeRepository>();
+builder.Services.AddSingleton<IPromoCodeValidator, PromoCodeValidator>();
+builder.Services.AddSingleton<IPromoCodeGenerator, PromoCodeGenerator>();
 
 builder.Services.AddSignalR();
 builder.Services.AddCors(options =>
@@ -41,6 +45,8 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.UseCors();
-app.MapHub<PromoCodeHub>("/promoCodeHub");
+
+app.MapHub<PromoCodeGenerationHub>("/promoCodeGenerationHub");
+app.MapHub<PromoCodeUsageHub>("/promoCodeUsageHub");
 
 app.Run();

@@ -1,20 +1,17 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 
 namespace PromoCodeService.Models;
 
+[Index(nameof(Code), IsUnique = true)]
 public class PromoCode
 {
     [Key]
-    public Guid Id { get; init; }
+    public Guid Id { get; set; }
 
-    [MaxLength(50)]
-    public required string Code { get; init; }
+    public required string Code { get; set; }
 
-    public DateTime ExpiryDate { get; init; }
+    public bool IsActive { get; set; }
 
-    public bool IsActive { get; init; }
-
-    public decimal DiscountAmount { get; init; }
-
-    public required string RequestId { get; init; }
+    public required string RequestId { get; set; }
 }

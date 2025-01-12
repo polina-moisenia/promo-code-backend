@@ -1,8 +1,10 @@
+using PromoCodeService.Models;
+
 namespace PromoCodeService.Data.Repositories;
 
 public interface IPromoCodeRepository
 {
-     Task<bool> IsCodeExistsAsync(string code);
      Task AddPromoCodesAsync(IEnumerable<string> codes, string requestId);
-     Task<IEnumerable<string>> GetCodesByRequestIdAsync(string requestId);
+     Task<PromoCode?> GetPromoCodeByCodeAsync(string code);
+     Task UpdatePromoCodeAsync(PromoCode promoCode);
 }

@@ -3,13 +3,13 @@ using PromoCodeService.Models;
 
 namespace PromoCodeService.Data.Repositories;
 
-public class PromoCodeRepository(PromoCodeDbContext context) : IPromoCodeRepository
+public class PromoCodeRepository : IPromoCodeRepository
 {
-    private readonly PromoCodeDbContext _context = context;
+    private readonly PromoCodeDbContext _context;
 
-    public async Task<bool> IsCodeExistsAsync(string code)
+    public PromoCodeRepository(PromoCodeDbContext context)
     {
-        return await _context.PromoCodes.AnyAsync(p => p.Code == code);
+        _context = context;
     }
 
     public async Task AddPromoCodesAsync(IEnumerable<string> codes, string requestId)
@@ -19,22 +19,21 @@ public class PromoCodeRepository(PromoCodeDbContext context) : IPromoCodeReposit
             Id = Guid.NewGuid(),
             Code = code,
             RequestId = requestId,
-            IsActive = true,
-            ExpiryDate = DateTime.UtcNow.AddMonths(1),
-            DiscountAmount = 10
+            IsActive = true
         });
 
         await _context.PromoCodes.AddRangeAsync(promoCodes);
         await _context.SaveChangesAsync();
     }
 
-
-    public async Task<IEnumerable<string>> GetCodesByRequestIdAsync(string requestId)
+    public async Task<PromoCode?> GetPromoCodeByCodeAsync(string code)
     {
-        return await _context.PromoCodes
-            .Where(p => p.RequestId == requestId)
-            .Select(p => p.Code)
-            .ToListAsync();
+        return await _context.PromoCodes.FirstOrDefaultAsync(p => p.Code == code);
+    }
+
+    public async Task UpdatePromoCodeAsync(PromoCode promoCode)
+    {
+        _context.PromoCodes.Update(promoCode);
+        await _context.SaveChangesAsync();
     }
 }
-

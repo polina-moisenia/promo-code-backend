@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PromoCodeService.Data;
@@ -11,9 +12,11 @@ using PromoCodeService.Data;
 namespace PromoCodeService.Migrations
 {
     [DbContext(typeof(PromoCodeDbContext))]
-    partial class PromoCodeDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250112171246_FieldsShortenIndexAdded")]
+    partial class FieldsShortenIndexAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
