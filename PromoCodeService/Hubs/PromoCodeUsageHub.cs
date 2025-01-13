@@ -4,34 +4,36 @@ using PromoCodeService.Services;
 
 namespace PromoCodeService.Hubs;
 
-public class PromoCodeUsageHub : Hub
+public class PromoCodeUsageHub(IPromoCodeRepository repository, IPromoCodeValidator validator) : Hub
 {
-    private readonly IPromoCodeRepository _repository;
-    private readonly IPromoCodeValidator _validator;
+    private readonly IPromoCodeRepository _repository = repository;
+    private readonly IPromoCodeValidator _validator = validator;
 
-    public PromoCodeUsageHub(IPromoCodeRepository repository, IPromoCodeValidator validator)
+    public async Task<bool> UsePromoCode(string code)
     {
-        _repository = repository;
-        _validator = validator;
-    }
-
-    public async Task<bool> UseCode(string code)
-    {
-        if (!_validator.ValidatePromoCode(code))
+        try
         {
+            if (!_validator.ValidatePromoCode(code))
+            {
+                return false;
+            }
+
+            var promoCode = await _repository.GetPromoCodeByCodeAsync(code);
+
+            if (promoCode == null || !promoCode.IsActive)
+            {
+                return false;
+            }
+
+            promoCode.IsActive = false;
+            await _repository.UpdatePromoCodeAsync(promoCode);
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in UseCode: {ex.Message}");
             return false;
         }
-
-        var promoCode = await _repository.GetPromoCodeByCodeAsync(code);
-
-        if (promoCode == null || !promoCode.IsActive)
-        {
-            return false;
-        }
-
-        promoCode.IsActive = false;
-        await _repository.UpdatePromoCodeAsync(promoCode);
-
-        return true;
     }
 }

@@ -12,8 +12,8 @@ using PromoCodeService.Data;
 namespace PromoCodeService.Migrations
 {
     [DbContext(typeof(PromoCodeDbContext))]
-    [Migration("20250112171246_FieldsShortenIndexAdded")]
-    partial class FieldsShortenIndexAdded
+    [Migration("20250113123534_ChangeFieldsIndexAdded")]
+    partial class ChangeFieldsIndexAdded
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -35,12 +35,14 @@ namespace PromoCodeService.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("RequestId")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 

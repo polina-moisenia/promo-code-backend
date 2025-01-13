@@ -4,7 +4,7 @@ public class PromoCodeValidator : IPromoCodeValidator
 {
     public bool ValidateGenerationParameters(ushort count, byte length)
     {
-        return count <= 2000 && length > 0 && length <= 8;
+        return count <= 2000 && (length == 7 || length == 8);
     }
 
     public bool ValidatePromoCode(string code)

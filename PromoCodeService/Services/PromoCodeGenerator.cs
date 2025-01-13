@@ -15,6 +15,6 @@ public class PromoCodeGenerator : IPromoCodeGenerator
             .Replace("/", string.Empty)
             .Replace("=", string.Empty);
 
-        return base64Hash.Substring(0, length);
+        return base64Hash[..length].ToUpperInvariant();
     }
 }

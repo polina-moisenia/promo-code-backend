@@ -4,47 +4,41 @@ using PromoCodeService.Services;
 
 namespace PromoCodeService.Hubs;
 
-public class PromoCodeGenerationHub : Hub
+public class PromoCodeGenerationHub(
+    IPromoCodeRepository repository,
+    IPromoCodeValidator validator,
+    IPromoCodeGenerator generator) : Hub
 {
-    private readonly IPromoCodeRepository _repository;
-    private readonly IPromoCodeValidator _validator;
-    private readonly IPromoCodeGenerator _generator;
-
-    public PromoCodeGenerationHub(
-        IPromoCodeRepository repository,
-        IPromoCodeValidator validator,
-        IPromoCodeGenerator generator)
-    {
-        _repository = repository;
-        _validator = validator;
-        _generator = generator;
-    }
+    private readonly IPromoCodeRepository _repository = repository;
+    private readonly IPromoCodeValidator _validator = validator;
+    private readonly IPromoCodeGenerator _generator = generator;
 
     public async Task<bool> GeneratePromoCodes(ushort count, byte length)
     {
-        if (!_validator.ValidateGenerationParameters(count, length))
+        try
         {
-            await Clients.Caller.SendAsync("GenerationResult", false);
+            if (!_validator.ValidateGenerationParameters(count, length))
+            {
+                return false;
+            }
+
+            var generatedCodes = GetPromoCodes(count, length).ToList();
+            await _repository.AddPromoCodesAsync(generatedCodes);
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in GeneratePromoCodes: {ex.Message}");
             return false;
         }
+    }
 
-        var requestId = Context.ConnectionId;
-        var generatedCodes = new List<string>();
-
+    public IEnumerable<string> GetPromoCodes(ushort count, byte length)
+    {
         for (int i = 0; i < count; i++)
         {
-            var code = _generator.GeneratePromoCode(length);
-            generatedCodes.Add(code);
+            yield return _generator.GeneratePromoCode(length);
         }
-
-        await _repository.AddPromoCodesAsync(generatedCodes, requestId);
-        await Clients.Caller.SendAsync("GenerationResult", true);
-
-        foreach (var promoCode in generatedCodes)
-        {
-            await Clients.Caller.SendAsync("ReceivePromoCode", promoCode);
-        }
-
-        return true;
     }
 }

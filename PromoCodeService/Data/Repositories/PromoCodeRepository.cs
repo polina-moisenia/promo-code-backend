@@ -3,23 +3,18 @@ using PromoCodeService.Models;
 
 namespace PromoCodeService.Data.Repositories;
 
-public class PromoCodeRepository : IPromoCodeRepository
+public class PromoCodeRepository(PromoCodeDbContext context) : IPromoCodeRepository
 {
-    private readonly PromoCodeDbContext _context;
+    private readonly PromoCodeDbContext _context = context;
 
-    public PromoCodeRepository(PromoCodeDbContext context)
-    {
-        _context = context;
-    }
-
-    public async Task AddPromoCodesAsync(IEnumerable<string> codes, string requestId)
+    public async Task AddPromoCodesAsync(IEnumerable<string> codes)
     {
         var promoCodes = codes.Select(code => new PromoCode
         {
             Id = Guid.NewGuid(),
             Code = code,
-            RequestId = requestId,
-            IsActive = true
+            IsActive = true,
+            CreatedAt = DateTime.UtcNow
         });
 
         await _context.PromoCodes.AddRangeAsync(promoCodes);
@@ -33,6 +28,7 @@ public class PromoCodeRepository : IPromoCodeRepository
 
     public async Task UpdatePromoCodeAsync(PromoCode promoCode)
     {
+        promoCode.UpdatedAt = DateTime.UtcNow;
         _context.PromoCodes.Update(promoCode);
         await _context.SaveChangesAsync();
     }

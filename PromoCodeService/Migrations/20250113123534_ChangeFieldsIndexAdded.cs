@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace PromoCodeService.Migrations
 {
     /// <inheritdoc />
-    public partial class FieldsShortenIndexAdded : Migration
+    public partial class ChangeFieldsIndexAdded : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -16,8 +16,13 @@ namespace PromoCodeService.Migrations
                 table: "PromoCodes");
 
             migrationBuilder.DropColumn(
-                name: "ExpiryDate",
+                name: "RequestId",
                 table: "PromoCodes");
+
+            migrationBuilder.RenameColumn(
+                name: "ExpiryDate",
+                table: "PromoCodes",
+                newName: "CreatedAt");
 
             migrationBuilder.AlterColumn<string>(
                 name: "Code",
@@ -27,6 +32,12 @@ namespace PromoCodeService.Migrations
                 oldClrType: typeof(string),
                 oldType: "character varying(50)",
                 oldMaxLength: 50);
+
+            migrationBuilder.AddColumn<DateTime>(
+                name: "UpdatedAt",
+                table: "PromoCodes",
+                type: "timestamp with time zone",
+                nullable: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_PromoCodes_Code",
@@ -41,6 +52,15 @@ namespace PromoCodeService.Migrations
             migrationBuilder.DropIndex(
                 name: "IX_PromoCodes_Code",
                 table: "PromoCodes");
+
+            migrationBuilder.DropColumn(
+                name: "UpdatedAt",
+                table: "PromoCodes");
+
+            migrationBuilder.RenameColumn(
+                name: "CreatedAt",
+                table: "PromoCodes",
+                newName: "ExpiryDate");
 
             migrationBuilder.AlterColumn<string>(
                 name: "Code",
@@ -58,12 +78,12 @@ namespace PromoCodeService.Migrations
                 nullable: false,
                 defaultValue: 0m);
 
-            migrationBuilder.AddColumn<DateTime>(
-                name: "ExpiryDate",
+            migrationBuilder.AddColumn<string>(
+                name: "RequestId",
                 table: "PromoCodes",
-                type: "timestamp with time zone",
+                type: "text",
                 nullable: false,
-                defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
+                defaultValue: "");
         }
     }
 }

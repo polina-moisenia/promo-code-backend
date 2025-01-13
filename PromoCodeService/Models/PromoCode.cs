@@ -8,10 +8,8 @@ public class PromoCode
 {
     [Key]
     public Guid Id { get; set; }
-
     public required string Code { get; set; }
-
     public bool IsActive { get; set; }
-
-    public required string RequestId { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime? UpdatedAt { get; set; }
 }
