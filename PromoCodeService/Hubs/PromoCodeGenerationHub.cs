@@ -25,6 +25,8 @@ public class PromoCodeGenerationHub(
             var generatedCodes = GetPromoCodes(count, length).ToList();
             await _repository.AddPromoCodesAsync(generatedCodes);
 
+            await NotifyClientWithGeneratedCodes(generatedCodes);
+
             return true;
         }
         catch (Exception ex)
@@ -34,11 +36,18 @@ public class PromoCodeGenerationHub(
         }
     }
 
-    public IEnumerable<string> GetPromoCodes(ushort count, byte length)
+    private IEnumerable<string> GetPromoCodes(ushort count, byte length)
     {
         for (int i = 0; i < count; i++)
         {
             yield return _generator.GeneratePromoCode(length);
         }
+    }
+
+    private async Task NotifyClientWithGeneratedCodes(IEnumerable<string> codes)
+    {
+        // Send generated codes to the client
+        // (not part of the task requirements, added for testing and frontend display)
+        await Clients.Caller.SendAsync("CodesGenerated", codes);
     }
 }
