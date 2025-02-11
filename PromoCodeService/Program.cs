@@ -15,6 +15,7 @@ builder.Services.AddDbContext<PromoCodeDbContext>(options =>
 builder.Services.AddScoped<IPromoCodeRepository, PromoCodeRepository>();
 builder.Services.AddSingleton<IPromoCodeValidator, PromoCodeValidator>();
 builder.Services.AddSingleton<IPromoCodeGenerator, PromoCodeGenerator>();
+builder.Services.AddScoped<IPromoCodeService, PromoCodeCreateService>();
 
 builder.Services.AddSignalR();
 builder.Services.AddCors(options =>

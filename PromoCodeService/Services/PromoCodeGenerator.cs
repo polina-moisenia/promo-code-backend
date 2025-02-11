@@ -1,20 +1,18 @@
-using System.Security.Cryptography;
-using System.Text;
-
 namespace PromoCodeService.Services;
 
 public class PromoCodeGenerator : IPromoCodeGenerator
 {
+    private readonly Random _random = new();
+    private const string _chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
     public string GeneratePromoCode(byte length)
     {
-        using var sha256 = SHA256.Create();
-        var guid = Guid.NewGuid().ToString();
-        var hash = sha256.ComputeHash(Encoding.UTF8.GetBytes(guid));
-        var base64Hash = Convert.ToBase64String(hash)
-            .Replace("+", string.Empty)
-            .Replace("/", string.Empty)
-            .Replace("=", string.Empty);
+        char[] buffer = new char[length];
+        for (int i = 0; i < length; i++)
+        {
+            buffer[i] = _chars[_random.Next(_chars.Length)];
+        }
 
-        return base64Hash[..length].ToUpperInvariant();
+        return new string(buffer);
     }
 }

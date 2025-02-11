@@ -18,17 +18,7 @@ public class PromoCodeUsageHub(IPromoCodeRepository repository, IPromoCodeValida
                 return false;
             }
 
-            var promoCode = await _repository.GetPromoCodeByCodeAsync(code);
-
-            if (promoCode == null || !promoCode.IsActive)
-            {
-                return false;
-            }
-
-            promoCode.IsActive = false;
-            await _repository.UpdatePromoCodeAsync(promoCode);
-
-            return true;
+            return await _repository.UsePromoCodeAsync(code);
         }
         catch (Exception ex)
         {

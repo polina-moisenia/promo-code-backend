@@ -1,17 +1,12 @@
 using Microsoft.AspNetCore.SignalR;
-using PromoCodeService.Data.Repositories;
 using PromoCodeService.Services;
 
 namespace PromoCodeService.Hubs;
 
-public class PromoCodeGenerationHub(
-    IPromoCodeRepository repository,
-    IPromoCodeValidator validator,
-    IPromoCodeGenerator generator) : Hub
+public class PromoCodeGenerationHub(IPromoCodeService promoCodeService, IPromoCodeValidator validator) : Hub
 {
-    private readonly IPromoCodeRepository _repository = repository;
+    private readonly IPromoCodeService _promoCodeService = promoCodeService;
     private readonly IPromoCodeValidator _validator = validator;
-    private readonly IPromoCodeGenerator _generator = generator;
 
     public async Task<bool> GeneratePromoCodes(ushort count, byte length)
     {
@@ -22,9 +17,7 @@ public class PromoCodeGenerationHub(
                 return false;
             }
 
-            var generatedCodes = GetPromoCodes(count, length).ToList();
-            await _repository.AddPromoCodesAsync(generatedCodes);
-
+            var generatedCodes = await _promoCodeService.GeneratePromoCodesAsync(count, length);
             await NotifyClientWithGeneratedCodes(generatedCodes);
 
             return true;
@@ -33,14 +26,6 @@ public class PromoCodeGenerationHub(
         {
             Console.WriteLine($"Error in GeneratePromoCodes: {ex.Message}");
             return false;
-        }
-    }
-
-    private IEnumerable<string> GetPromoCodes(ushort count, byte length)
-    {
-        for (int i = 0; i < count; i++)
-        {
-            yield return _generator.GeneratePromoCode(length);
         }
     }
 

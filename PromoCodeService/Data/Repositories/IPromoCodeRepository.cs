@@ -1,10 +1,10 @@
-using PromoCodeService.Models;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace PromoCodeService.Data.Repositories;
 
 public interface IPromoCodeRepository
 {
-     Task AddPromoCodesAsync(IEnumerable<string> codes);
-     Task<PromoCode?> GetPromoCodeByCodeAsync(string code);
-     Task UpdatePromoCodeAsync(PromoCode promoCode);
+     Task<IDbContextTransaction> BeginTransactionAsync();
+     Task<bool> TryAddPromoCodeAsync(string code);
+     Task<bool> UsePromoCodeAsync(string code);
 }
